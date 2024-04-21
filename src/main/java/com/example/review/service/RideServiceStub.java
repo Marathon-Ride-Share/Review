@@ -34,7 +34,7 @@ public class RideServiceStub {
         ride.setPrice(v);
         ride.setStatus("In Progress");
         ride.setAvailableSeats(3);
-        ride.setPassengers(List.of(new Passenger("passenger1", new Location(12.34, 56.78, "OriginName"))));
+        ride.setPassengers(List.of(new Passenger("passenger1", new Location(12.34, 56.78, "OriginName"),"paymentOrderId1")));
         // 将Ride对象包装在一个Mono中，并返回
         return ride;
     }

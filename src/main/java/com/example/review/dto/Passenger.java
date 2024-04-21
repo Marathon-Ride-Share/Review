@@ -13,4 +13,5 @@ import lombok.Data;
 public class Passenger {
     private final String passengerName;
     private final Location pickupLocation;
+    private final String paymentOrderId;
 }

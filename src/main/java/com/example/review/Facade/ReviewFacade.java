@@ -1,12 +1,16 @@
 package com.example.review.Facade;
 
+import com.example.review.common.ServerResponse;
+import com.example.review.common.StatusCode;
 import com.example.review.dto.*;
 import com.example.review.service.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import com.example.review.model.Review;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -27,73 +31,73 @@ public class ReviewFacade {
         this.userService = userService;
     }
 
-//    private final UserServiceStub userServiceStub;
-//    private final RideServiceStub rideServiceStub;
+    public ServerResponse<Review> addReview(PostReviewReq postReviewReq) {
+        try {
+            Ride ride = rideService.getRideByRideId(postReviewReq.getRideId());
+            Review review = createReview(postReviewReq, ride);
+            ServerResponse<Review> savedReview = reviewService.addReview(review);
+            ServerResponse<Float> avgRating = reviewService.calculateAverageRating(review.getDriverId());
+            User user = userService.setDriverRating(review.getDriverId(), avgRating.getData());
 
-
-//
-//    public ReviewFacade(UserServiceStub userServiceStub, RideServiceStub rideServiceStub, ReviewService reviewService) {
-//        this.userServiceStub = userServiceStub;
-//        this.rideServiceStub = rideServiceStub;
-//        this.reviewService = reviewService;
-//    }
-
-
-
-    public Review addReview(PostReviewReq postReviewReq) {
-        Ride ride = rideService.getRideByRideId(postReviewReq.getRideId());
-
-        Review review = createReview(postReviewReq, ride);
-
-        reviewService.addReview(review);
-
-        float avgRating = reviewService.calculateAverageRating(review.getDriverId());
-
-        User user = userService.setDriverRating(review.getDriverId(), avgRating);
-
-        return review;
+            return new ServerResponse<>(StatusCode.SUCCESS, "Review added successfully", savedReview.getData());
+        } catch (Exception e) {
+            return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while adding the review", null);
+        }
     }
 
-    //return ride history detail List both as an passenger and driver by user id
-    //need to call ride service to get RideHistory:driverRideIds, passengerRideIds;
-    //for each rideId in driverRideIds, call ride service to get ride detail and store&return  RideHistoryDetail
-    public RideHistoryDetail displayRideHistoryList(String userId) {
-        RideHistory rideHistory = rideService.getRideByUserId(userId);
+    public ServerResponse<RideHistoryDetail> displayRideHistoryList(String userId) {
+        try {
+            RideHistory rideHistory = rideService.getRideByUserId(userId);
+            List<Ride> driverRides = new ArrayList<>();
+            for (String rideId : rideHistory.getDriverRideIds()) {
+                Ride ride = rideService.getRideByRideId(rideId);
+                driverRides.add(ride);
+            }
+            List<Ride> passengerRides = new ArrayList<>();
+            for (String rideId : rideHistory.getPassengerRideIds()) {
+                Ride ride = rideService.getRideByRideId(rideId);
+                passengerRides.add(ride);
+            }
+            RideHistoryDetail rideHistoryDetail = new RideHistoryDetail();
+            rideHistoryDetail.setDriverRides(driverRides);
+            rideHistoryDetail.setPassengerRides(passengerRides);
+            return new ServerResponse<>(StatusCode.SUCCESS, "Ride history retrieved successfully", rideHistoryDetail);
+        } catch (Exception e) {
+            return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while retrieving the ride history", null);
+        }
+    }
 
-        List<Ride> driverRides = new ArrayList<>();
-        for (String rideId : rideHistory.getDriverRideIds()) {
+    public ServerResponse<RideReview> displayRideAndReviews(String rideId) {
+        try {
             Ride ride = rideService.getRideByRideId(rideId);
-            driverRides.add(ride);
+            ServerResponse<List<Review>> reviews = reviewService.getReviewsByRideId(rideId);
+            RideReview rideReview = new RideReview();
+            rideReview.setRide(ride);
+            rideReview.setReviews(reviews.getData());
+            return new ServerResponse<>(StatusCode.SUCCESS, "Ride and reviews retrieved successfully", rideReview);
+        } catch (Exception e) {
+            return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while retrieving the ride and reviews", null);
+        }
+    }
+
+    public ServerResponse<Review> updateReview(String reviewId, String userId, PostReviewReq postReviewReq) {
+        // 假设你已经有了一个方法可以根据 reviewId 获取评论的作者的 userId
+        ServerResponse<String> authorId = reviewService.getAuthorIdByReviewId(reviewId);
+        if (!userId.equals(authorId.getData())) {
+            return new ServerResponse<>(StatusCode.FORBIDDEN, "You do not have permission to update this review", null);
         }
 
-        List<Ride> passengerRides = new ArrayList<>();
-        for (String rideId : rideHistory.getPassengerRideIds()) {
-            Ride ride = rideService.getRideByRideId(rideId);
-            passengerRides.add(ride);
+        return reviewService.updateReview(reviewId, postReviewReq);
+    }
+
+    public ServerResponse<Review> deleteReview(String reviewId, String userId) {
+        ServerResponse<String> authorId = reviewService.getAuthorIdByReviewId(reviewId);
+        if (!userId.equals(authorId.getData())) {
+            return new ServerResponse<>(StatusCode.FORBIDDEN, "You do not have permission to update this review", null);
         }
 
-        // 创建 RideHistoryDetail 对象并设置 driverRides 和 passengerRides
-        RideHistoryDetail rideHistoryDetail = new RideHistoryDetail();
-        rideHistoryDetail.setDriverRides(driverRides);
-        rideHistoryDetail.setPassengerRides(passengerRides);
-
-        return rideHistoryDetail;
-
+        return reviewService.deleteReview(reviewId);
     }
-
-
-
-    public RideReview displayRideAndReviews(String rideId) {
-        Ride ride = rideService.getRideByRideId(rideId);
-        List<Review> reviews = reviewService.getReviewsByRideId(rideId);
-
-        RideReview rideReview = new RideReview();
-        rideReview.setRide(ride);
-        rideReview.setReviews(reviews);
-
-        return rideReview;
-    }
-
 
     private Review createReview(PostReviewReq postReviewReq, Ride ride) {
         Review review = new Review();
@@ -102,7 +106,6 @@ public class ReviewFacade {
         review.setRating(postReviewReq.getRating());
         review.setComment(postReviewReq.getComment());
         review.setDriverId(ride.getDriverInfo().getDriverName());
-
         Review.RideSummary rideSummary = new Review.RideSummary();
         rideSummary.setStartTime(ride.getStartTime());
         rideSummary.setEndTime(ride.getEndTime());
@@ -110,10 +113,7 @@ public class ReviewFacade {
         rideSummary.setDestination(ride.getDestination());
         rideSummary.setPrice(ride.getPrice());
         rideSummary.setLicensePlate(ride.getVehicle().getLicensePlate());
-
         review.setRideSummary(rideSummary);
-
         return review;
     }
-
 }

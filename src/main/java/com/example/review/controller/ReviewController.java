@@ -1,5 +1,6 @@
 package com.example.review.controller;
 import com.example.review.Facade.ReviewFacade;
+import com.example.review.common.ServerResponse;
 import com.example.review.dto.PostReviewReq;
 import com.example.review.dto.Ride;
 import com.example.review.dto.RideHistoryDetail;
@@ -23,19 +24,29 @@ public class ReviewController {
 
 
     @PostMapping
-    public Review addReview(@RequestBody PostReviewReq postReviewReq) {
-        Review review = reviewFacade.addReview(postReviewReq);
+    public ServerResponse<Review> addReview(@RequestBody PostReviewReq postReviewReq) {
+        ServerResponse<Review> review = reviewFacade.addReview(postReviewReq);
         return review;
     }
 
     @GetMapping("/{userId}/rides")
-    public RideHistoryDetail displayRideHistoryList(String userId) {
+    public ServerResponse<RideHistoryDetail> displayRideHistoryList(String userId) {
         return reviewFacade.displayRideHistoryList(userId);
     }
 
     @GetMapping("/{rideId}")
-    public RideReview displayRideAndReviews(String rideId) {
+    public ServerResponse<RideReview> displayRideAndReviews(String rideId) {
         return reviewFacade.displayRideAndReviews(rideId);
+    }
+
+    @PatchMapping("/{reviewId}")
+    public ServerResponse<Review> updateReview(@PathVariable String reviewId, @PathVariable String userId, @RequestBody PostReviewReq postReviewReq) {
+        return reviewFacade.updateReview(reviewId, userId, postReviewReq);
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ServerResponse<Review> deleteReview(@PathVariable String reviewId, @PathVariable String userId) {
+        return reviewFacade.deleteReview( reviewId, userId);
     }
 
 }
