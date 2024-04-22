@@ -33,6 +33,18 @@ public class ReviewFacade {
 
     public ServerResponse<Review> addReview(PostReviewReq postReviewReq) {
         try {
+            // 检查当前用户是否已经对当前的行程发表过评论
+            ServerResponse<Review> existingReview = reviewService.getReviewByUserIdAndRideId(postReviewReq.getUserId(), postReviewReq.getRideId());
+            if (existingReview.getData() != null) {
+                return new ServerResponse<>(StatusCode.BAD_REQUEST, "You have already reviewed this ride", null);
+            }
+
+            // 检查当前用户是否是这个行程的乘客
+            RideHistory rideHistory = rideService.getRideByUserId(postReviewReq.getUserId());
+            if (!rideHistory.getPassengerRideIds().contains(postReviewReq.getRideId())) {
+                return new ServerResponse<>(StatusCode.FORBIDDEN, "You are not a passenger of this ride", null);
+            }
+
             Ride ride = rideService.getRideByRideId(postReviewReq.getRideId());
             Review review = createReview(postReviewReq, ride);
             ServerResponse<Review> savedReview = reviewService.addReview(review);
@@ -80,24 +92,43 @@ public class ReviewFacade {
         }
     }
 
-    public ServerResponse<Review> updateReview(String reviewId, String userId, PostReviewReq postReviewReq) {
-        // 假设你已经有了一个方法可以根据 reviewId 获取评论的作者的 userId
-        ServerResponse<String> authorId = reviewService.getAuthorIdByReviewId(reviewId);
-        if (!userId.equals(authorId.getData())) {
-            return new ServerResponse<>(StatusCode.FORBIDDEN, "You do not have permission to update this review", null);
-        }
 
-        return reviewService.updateReview(reviewId, postReviewReq);
+public ServerResponse<Review> updateReview(String reviewId, String userId, PostReviewReq postReviewReq) {
+    ServerResponse<String> authorId = reviewService.getAuthorIdByReviewId(reviewId);
+    if (!userId.equals(authorId.getData())) {
+        return new ServerResponse<>(StatusCode.FORBIDDEN, "You do not have permission to update this review", null);
     }
+
+    ServerResponse<Review> updatedReview = reviewService.updateReview(reviewId, postReviewReq);
+    if (updatedReview.getStatusCode() == StatusCode.SUCCESS) {
+        // 如果评论更新成功，重新计算平均评分并更新司机的评分
+        ServerResponse<Float> avgRating = reviewService.calculateAverageRating(updatedReview.getData().getDriverId());
+        userService.setDriverRating(updatedReview.getData().getDriverId(), avgRating.getData());
+    }
+
+    return updatedReview;
+}
 
     public ServerResponse<Review> deleteReview(String reviewId, String userId) {
         ServerResponse<String> authorId = reviewService.getAuthorIdByReviewId(reviewId);
         if (!userId.equals(authorId.getData())) {
-            return new ServerResponse<>(StatusCode.FORBIDDEN, "You do not have permission to update this review", null);
+            return new ServerResponse<>(StatusCode.FORBIDDEN, "You do not have permission to delete this review", null);
         }
 
-        return reviewService.deleteReview(reviewId);
+        ServerResponse<Review> deletedReview = reviewService.deleteReview(reviewId);
+        if (deletedReview.getStatusCode() == StatusCode.SUCCESS) {
+            // 如果评论删除成功，重新计算平均评分并更新司机的评分
+            ServerResponse<Float> avgRating = reviewService.calculateAverageRating(deletedReview.getData().getDriverId());
+            userService.setDriverRating(deletedReview.getData().getDriverId(), avgRating.getData());
+        }
+
+        return deletedReview;
     }
+
+    public ServerResponse<List<Review>> getReviewByUserId(String userId) {
+        return reviewService.getReviewByUserId(userId);
+    }
+
 
     private Review createReview(PostReviewReq postReviewReq, Ride ride) {
         Review review = new Review();

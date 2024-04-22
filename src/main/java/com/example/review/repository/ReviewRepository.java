@@ -22,4 +22,6 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
 
     // 例如，根据 rideId 查询评论列表
     List<Review> getReviewsByRideId(String rideId);  // 根据行程ID查找评价
+    Review findByUserIdAndRideId(String userId, String rideId);
+    List<Review> findByUserId(String userId);
 }

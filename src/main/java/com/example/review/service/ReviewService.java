@@ -102,4 +102,30 @@ public class ReviewService {
             return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while retrieving the author id", null);
         }
     }
+
+    public ServerResponse<Review> getReviewByUserIdAndRideId(String userId, String rideId) {
+        try {
+            Review review = reviewRepository.findByUserIdAndRideId(userId, rideId);
+            if (review != null) {
+                return new ServerResponse<>(StatusCode.SUCCESS, "Review retrieved successfully", review);
+            } else {
+                return new ServerResponse<>(StatusCode.NOT_FOUND, "No review found for this user and ride", null);
+            }
+        } catch (Exception e) {
+            return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while retrieving the review", null);
+        }
+    }
+
+    public ServerResponse<List<Review>> getReviewByUserId(String userId) {
+        try {
+            List<Review> reviews = reviewRepository.findByUserId(userId);
+            if (!reviews.isEmpty()) {
+                return new ServerResponse<>(StatusCode.SUCCESS, "Reviews retrieved successfully", reviews);
+            } else {
+                return new ServerResponse<>(StatusCode.NOT_FOUND, "No reviews found for this user", null);
+            }
+        } catch (Exception e) {
+            return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while retrieving the reviews", null);
+        }
+    }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class RideServiceStub {
 
-    public Ride getRideById(String rideId) {
+    public Ride getRideByRideId(String rideId) {
         // 创建一个Ride对象，并填充一些预定义的数据
         Ride ride = new Ride();
         ride.setRideId(rideId);
@@ -37,5 +37,12 @@ public class RideServiceStub {
         ride.setPassengers(List.of(new Passenger("passenger1", new Location(12.34, 56.78, "OriginName"),"paymentOrderId1")));
         // 将Ride对象包装在一个Mono中，并返回
         return ride;
+    }
+
+    public RideHistory getRideByUserId(String userId) {
+        RideHistory rideHistory = new RideHistory();
+        rideHistory.setDriverRideIds(List.of("ride1", "ride2"));
+        rideHistory.setPassengerRideIds(List.of("ride3", "ride4"));
+        return rideHistory;
     }
 }

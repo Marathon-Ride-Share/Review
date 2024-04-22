@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * @Author: hhx
  * @Date: 2024/4/16 17:44
@@ -21,6 +23,11 @@ public class ReviewController {
 
     @Autowired
     private ReviewFacade reviewFacade;
+
+    @GetMapping("/users/{userId}")
+    public ServerResponse<List<Review>> getReviewByUserId(@PathVariable String userId) {
+         return reviewFacade.getReviewByUserId(userId);
+    }
 
 
     @PostMapping
