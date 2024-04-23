@@ -34,10 +34,10 @@ public class ReviewFacade {
     public ServerResponse<Review> addReview(PostReviewReq postReviewReq) {
         try {
             // 检查当前用户是否已经对当前的行程发表过评论
-            ServerResponse<Review> existingReview = reviewService.getReviewByUserIdAndRideId(postReviewReq.getUserId(), postReviewReq.getRideId());
-            if (existingReview.getData() != null) {
-                return new ServerResponse<>(StatusCode.BAD_REQUEST, "You have already reviewed this ride", null);
-            }
+//            ServerResponse<Review> existingReview = reviewService.getReviewByUserIdAndRideId(postReviewReq.getUserId(), postReviewReq.getRideId());
+//            if (existingReview.getData() != null) {
+//                return new ServerResponse<>(StatusCode.BAD_REQUEST, "You have already reviewed this ride", null);
+//            }
 
             // 检查当前用户是否是这个行程的乘客
             RideHistory rideHistory = rideService.getRideByUserId(postReviewReq.getUserId());
@@ -49,7 +49,8 @@ public class ReviewFacade {
             Review review = createReview(postReviewReq, ride);
             ServerResponse<Review> savedReview = reviewService.addReview(review);
             ServerResponse<Float> avgRating = reviewService.calculateAverageRating(review.getDriverId());
-            User user = userService.setDriverRating(review.getDriverId(), avgRating.getData());
+//            User user = userService.getUserById(postReviewReq.getUserId());
+//            User user = userService.setDriverRating(review.getDriverId(), avgRating.getData());
 
             return new ServerResponse<>(StatusCode.SUCCESS, "Review added successfully", savedReview.getData());
         } catch (Exception e) {

@@ -33,11 +33,15 @@ public class RideService {
     }
 
     public RideHistory getRideByUserId(String userId) {
-        return webClient.get()
+        RideHistory dataStr  = webClient.get()
                 .uri("/rides/history/{userId}", userId)
                 .retrieve()
                 .bodyToMono(RideHistory.class)
-                .block();
+                .block();  // block() will wait for the Mono to complete and return the result
+
+//        System.out.println("RideHistory getRideByUserId"+dataStr.getDriverRideIds());
+        return dataStr;
+//        return parseRideFromResponse(dataStr);
     }
 
     public Ride parseRideFromResponse(String jsonResponse) {
