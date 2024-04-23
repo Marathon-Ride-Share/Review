@@ -82,6 +82,7 @@ public class ReviewFacade {
     public ServerResponse<RideReview> displayRideAndReviews(String rideId) {
         try {
             Ride ride = rideService.getRideByRideId(rideId);
+            System.out.println("+++++++++++++++" + ride);
             ServerResponse<List<Review>> reviews = reviewService.getReviewsByRideId(rideId);
             RideReview rideReview = new RideReview();
             rideReview.setRide(ride);

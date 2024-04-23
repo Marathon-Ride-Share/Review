@@ -1,6 +1,7 @@
 package com.example.review.service;
 
 import com.example.review.dto.Ride;
+import com.example.review.dto.RideDetailResponse;
 import com.example.review.dto.RideHistory;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -18,11 +19,16 @@ public class RideService {
     }
 
     public Ride getRideByRideId(String rideId) {
-        return webClient.get()
+        System.out.println("RideService"+rideId);
+
+                String aaa = webClient.get()
                 .uri("/rides/{rideId}", rideId)
                 .retrieve()
-                .bodyToMono(Ride.class)
+                .bodyToMono(String.class)
                 .block();  // block() will wait for the Mono to complete and return the result
+
+        System.out.println("RideService!!!!! "+aaa);
+        return null;
     }
 
     public RideHistory getRideByUserId(String userId) {

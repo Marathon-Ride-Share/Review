@@ -37,12 +37,12 @@ public class ReviewController {
     }
 
     @GetMapping("/{userId}/rides")
-    public ServerResponse<RideHistoryDetail> displayRideHistoryList(String userId) {
+    public ServerResponse<RideHistoryDetail> displayRideHistoryList(@PathVariable String userId) {
         return reviewFacade.displayRideHistoryList(userId);
     }
 
     @GetMapping("/{rideId}")
-    public ServerResponse<RideReview> displayRideAndReviews(String rideId) {
+    public ServerResponse<RideReview> displayRideAndReviews(@PathVariable String rideId) {
         return reviewFacade.displayRideAndReviews(rideId);
     }
 
