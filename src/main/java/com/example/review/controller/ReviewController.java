@@ -32,18 +32,19 @@ public class ReviewController {
 
     @PostMapping
     public ServerResponse<Review> addReview(@RequestBody PostReviewReq postReviewReq) {
-        System.out.println("addReview"+postReviewReq);
         ServerResponse<Review> review = reviewFacade.addReview(postReviewReq);
         return review;
     }
 
     @GetMapping("/{userId}/rides")
-    public ServerResponse<RideHistoryDetail> displayRideHistoryList(@PathVariable String userId) {
-        return reviewFacade.displayRideHistoryList(userId);
+    public ServerResponse<RideHistoryDetail> displayRideHistoryList( @PathVariable String userId) {
+        ServerResponse<RideHistoryDetail> rideHistoryDetail = reviewFacade.displayRideHistoryList(userId);
+        System.out.println(rideHistoryDetail.getData());
+        return rideHistoryDetail;
     }
 
     @GetMapping("/{rideId}")
-    public ServerResponse<RideReview> displayRideAndReviews(@PathVariable String rideId) {
+    public ServerResponse<RideReview> displayRideAndReviews( @PathVariable String rideId) {
         return reviewFacade.displayRideAndReviews(rideId);
     }
 

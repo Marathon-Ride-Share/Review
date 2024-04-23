@@ -61,6 +61,7 @@ public class ReviewFacade {
     public ServerResponse<RideHistoryDetail> displayRideHistoryList(String userId) {
         try {
             RideHistory rideHistory = rideService.getRideByUserId(userId);
+            System.out.println("ReviewFacade rideHistory: " + rideHistory);
             List<Ride> driverRides = new ArrayList<>();
             for (String rideId : rideHistory.getDriverRideIds()) {
                 Ride ride = rideService.getRideByRideId(rideId);
@@ -74,6 +75,7 @@ public class ReviewFacade {
             RideHistoryDetail rideHistoryDetail = new RideHistoryDetail();
             rideHistoryDetail.setDriverRides(driverRides);
             rideHistoryDetail.setPassengerRides(passengerRides);
+            System.out.println("after ReviewFacade rideHistoryDetail: " + rideHistoryDetail);
             return new ServerResponse<>(StatusCode.SUCCESS, "Ride history retrieved successfully", rideHistoryDetail);
         } catch (Exception e) {
             return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while retrieving the ride history", null);

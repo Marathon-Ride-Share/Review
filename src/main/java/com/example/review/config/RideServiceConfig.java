@@ -16,7 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class RideServiceConfig {
 
-    @Value("${ride.service.url}")
+    @Value("${rideService.url}")
     private String rideServiceUrl;
 
     @Autowired

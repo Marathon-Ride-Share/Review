@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Configuration
 public class UserServiceConfig {
-    @Value("${user.service.url}")
+    @Value("${userService.url}")
     private String userServiceUrl;
 
     @Bean

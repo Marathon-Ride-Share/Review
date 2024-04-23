@@ -19,7 +19,6 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
     @Query("{'driverId': ?0}")
     List<Review> findByDriverId(String driverId);
 
-
     // 例如，根据 rideId 查询评论列表
     List<Review> getReviewsByRideId(String rideId);  // 根据行程ID查找评价
     Review findByUserIdAndRideId(String userId, String rideId);
