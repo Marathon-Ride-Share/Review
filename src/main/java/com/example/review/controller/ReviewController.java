@@ -32,6 +32,7 @@ public class ReviewController {
 
     @PostMapping
     public ServerResponse<Review> addReview(@RequestBody PostReviewReq postReviewReq) {
+        System.out.println("addReview"+postReviewReq);
         ServerResponse<Review> review = reviewFacade.addReview(postReviewReq);
         return review;
     }

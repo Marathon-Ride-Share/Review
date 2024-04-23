@@ -24,7 +24,7 @@ public class RideServiceStub {
         Ride ride = new Ride();
         ride.setRideId(rideId);
         ride.setDriverInfo(new DriverInfo("driver1", 3.21F));
-        ride.setVehicle(new Vehicle("BMW", "White", "red", "1234"));
+        ride.setVehicleInfo(new Vehicle("BMW", "White", "red", "1234"));
         ride.setStartTime(LocalDateTime.now());
         ride.setEndTime(LocalDateTime.now().plusHours(1));
         ride.setOrigin(new Location( 12.34, 56.78,"OriginName"));

@@ -3,6 +3,8 @@ package com.example.review.service;
 import com.example.review.dto.Ride;
 import com.example.review.dto.RideDetailResponse;
 import com.example.review.dto.RideHistory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -14,21 +16,20 @@ import reactor.core.publisher.Mono;
 public class RideService {
     private final WebClient webClient;
 
-    public RideService(WebClient webClient) {
+    private ObjectMapper objectMapper;
+
+    public RideService(WebClient webClient,ObjectMapper objectMapper) {
         this.webClient = webClient;
+        this.objectMapper = objectMapper;
     }
 
     public Ride getRideByRideId(String rideId) {
-        System.out.println("RideService"+rideId);
-
-                String aaa = webClient.get()
+                String dataStr = webClient.get()
                 .uri("/rides/{rideId}", rideId)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();  // block() will wait for the Mono to complete and return the result
-
-        System.out.println("RideService!!!!! "+aaa);
-        return null;
+        return parseRideFromResponse(dataStr);
     }
 
     public RideHistory getRideByUserId(String userId) {
@@ -37,6 +38,18 @@ public class RideService {
                 .retrieve()
                 .bodyToMono(RideHistory.class)
                 .block();
+    }
+
+    public Ride parseRideFromResponse(String jsonResponse) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonResponse);  // 解析整个JSON字符串为JsonNode
+            JsonNode rideNode = rootNode.path("ride");  // 获取"ride"这个JSON对象
+            Ride ride = objectMapper.treeToValue(rideNode, Ride.class);  // 将"ride"对象映射到Ride类
+            return ride;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

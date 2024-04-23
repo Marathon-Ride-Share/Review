@@ -82,7 +82,6 @@ public class ReviewFacade {
     public ServerResponse<RideReview> displayRideAndReviews(String rideId) {
         try {
             Ride ride = rideService.getRideByRideId(rideId);
-            System.out.println("+++++++++++++++" + ride);
             ServerResponse<List<Review>> reviews = reviewService.getReviewsByRideId(rideId);
             RideReview rideReview = new RideReview();
             rideReview.setRide(ride);
@@ -144,7 +143,7 @@ public ServerResponse<Review> updateReview(String reviewId, String userId, PostR
         rideSummary.setOrigin(ride.getOrigin());
         rideSummary.setDestination(ride.getDestination());
         rideSummary.setPrice(ride.getPrice());
-        rideSummary.setLicensePlate(ride.getVehicle().getLicensePlate());
+        rideSummary.setLicensePlate(ride.getVehicleInfo().getLicensePlate());
         review.setRideSummary(rideSummary);
         return review;
     }
