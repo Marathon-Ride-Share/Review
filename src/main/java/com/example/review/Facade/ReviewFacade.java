@@ -40,10 +40,10 @@ public class ReviewFacade {
 //            }
 
             // 检查当前用户是否是这个行程的乘客
-            RideHistory rideHistory = rideService.getRideByUserId(postReviewReq.getUserId());
-            if (!rideHistory.getPassengerRideIds().contains(postReviewReq.getRideId())) {
-                return new ServerResponse<>(StatusCode.FORBIDDEN, "You are not a passenger of this ride", null);
-            }
+//            RideHistory rideHistory = rideService.getRideByUserId(postReviewReq.getUserId());
+//            if (!rideHistory.getPassengerRideIds().contains(postReviewReq.getRideId())) {
+//                return new ServerResponse<>(StatusCode.FORBIDDEN, "You are not a passenger of this ride", null);
+//            }
 
             Ride ride = rideService.getRideByRideId(postReviewReq.getRideId());
             Review review = createReview(postReviewReq, ride);
