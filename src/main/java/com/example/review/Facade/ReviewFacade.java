@@ -50,7 +50,7 @@ public class ReviewFacade {
             ServerResponse<Review> savedReview = reviewService.addReview(review);
             ServerResponse<Float> avgRating = reviewService.calculateAverageRating(review.getDriverId());
 //            User user = userService.getUserById(postReviewReq.getUserId());
-//            User user = userService.setDriverRating(review.getDriverId(), avgRating.getData());
+            User user = userService.setDriverRating(review.getDriverId(), avgRating.getData());
 
             return new ServerResponse<>(StatusCode.SUCCESS, "Review added successfully", savedReview.getData());
         } catch (Exception e) {
@@ -85,10 +85,13 @@ public class ReviewFacade {
     public ServerResponse<RideReview> displayRideAndReviews(String rideId) {
         try {
             Ride ride = rideService.getRideByRideId(rideId);
+//            System.out.println("ReviewFacade displayRideAndReviews ride: " + ride);
             ServerResponse<List<Review>> reviews = reviewService.getReviewsByRideId(rideId);
+//            System.out.println("ReviewFacade displayRideAndReviews reviews: " + reviews);
             RideReview rideReview = new RideReview();
             rideReview.setRide(ride);
             rideReview.setReviews(reviews.getData());
+//            System.out.println("ReviewFacade displayRideAndReviews rideReview: " + rideReview);
             return new ServerResponse<>(StatusCode.SUCCESS, "Ride and reviews retrieved successfully", rideReview);
         } catch (Exception e) {
             return new ServerResponse<>(StatusCode.INTERNAL_SERVER_ERROR, "An error occurred while retrieving the ride and reviews", null);

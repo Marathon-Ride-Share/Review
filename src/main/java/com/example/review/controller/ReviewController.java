@@ -39,12 +39,12 @@ public class ReviewController {
     @GetMapping("/{userId}/rides")
     public ServerResponse<RideHistoryDetail> displayRideHistoryList( @PathVariable String userId) {
         ServerResponse<RideHistoryDetail> rideHistoryDetail = reviewFacade.displayRideHistoryList(userId);
-        System.out.println(rideHistoryDetail.getData());
         return rideHistoryDetail;
     }
 
     @GetMapping("/{rideId}")
     public ServerResponse<RideReview> displayRideAndReviews( @PathVariable String rideId) {
+//        System.out.println("ReviewController displayRideAndReviews rideId: " + rideId);
         return reviewFacade.displayRideAndReviews(rideId);
     }
 

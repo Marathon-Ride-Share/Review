@@ -39,7 +39,7 @@ public class RideService {
                 .bodyToMono(RideHistory.class)
                 .block();  // block() will wait for the Mono to complete and return the result
 
-        System.out.println("RideHistory getRideByUserId"+dataStr.getDriverRideIds());
+//        System.out.println("RideHistory getRideByUserId"+dataStr.getDriverRideIds());
         return dataStr;
 //        return parseRideFromResponse(dataStr);
     }
