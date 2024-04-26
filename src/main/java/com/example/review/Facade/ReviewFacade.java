@@ -117,6 +117,7 @@ public ServerResponse<Review> updateReview(String reviewId, String userId, PostR
 
     public ServerResponse<Review> deleteReview(String reviewId, String userId) {
         ServerResponse<String> authorId = reviewService.getAuthorIdByReviewId(reviewId);
+//        System.out.println("ReviewFacade deleteReview authorId: " + authorId);
         if (!userId.equals(authorId.getData())) {
             return new ServerResponse<>(StatusCode.FORBIDDEN, "You do not have permission to delete this review", null);
         }
@@ -124,6 +125,7 @@ public ServerResponse<Review> updateReview(String reviewId, String userId, PostR
         ServerResponse<Review> deletedReview = reviewService.deleteReview(reviewId);
         if (deletedReview.getStatusCode() == StatusCode.SUCCESS) {
             // 如果评论删除成功，重新计算平均评分并更新司机的评分
+//            System.out.println("ReviewFacade deleteReview deletedReview: " + deletedReview.getData());
             ServerResponse<Float> avgRating = reviewService.calculateAverageRating(deletedReview.getData().getDriverId());
             userService.setDriverRating(deletedReview.getData().getDriverId(), avgRating.getData());
         }

@@ -53,9 +53,12 @@ public class ReviewController {
         return reviewFacade.updateReview(reviewId, userId, postReviewReq);
     }
 
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping("/{reviewId}/{userId}")
     public ServerResponse<Review> deleteReview(@PathVariable String reviewId, @PathVariable String userId) {
-        return reviewFacade.deleteReview( reviewId, userId);
+//        System.out.println("ReviewController deleteReview reviewId: " + reviewId + " userId: " + userId);
+        ServerResponse<Review> review = reviewFacade.deleteReview( reviewId, userId);
+
+        return review;
     }
 
 }
